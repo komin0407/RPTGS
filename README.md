@@ -4,7 +4,7 @@ Official implementation of **PAVE (Policy-Aware Value-field Equalization)**, a c
 
 > **Stabilizing the Q-Gradient Field for Policy Smoothness in Actor-Critic Methods.**
 > Jeong Woon Lee\*, Kyoleen Kwak\*, Daeho Kim\*, Hyoseok Hwang.
-> *International Conference on Machine Learning (ICML), 2026 — Spotlight.*
+> *International Conference on Machine Learning (ICML), 2026 — Oral.*
 
 🌐 **Project page**: <https://airlabkhu.github.io/PAVE/>
 📄 **arXiv**: <https://arxiv.org/abs/2601.22970>
