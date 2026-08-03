@@ -20,6 +20,7 @@ from models.aqfr_td3 import AQFRTD3
 from models.asap_td3 import ASAPTD3, ASAPPolicy
 from models.sr2l import *
 from models.pave_td3 import PaveTD3
+from models.rptgs_td3 import RPTGSTD3
 
 def train_vanilla(seed:int, total_time_steps:int, save_dir:str, log_dir:str, 
                   mkenv_func : Callable, env_args:dict, alg_args:dict, device: str = 'auto'):
@@ -193,7 +194,50 @@ def train_caps(seed:int, total_time_steps:int, save_dir:str, log_dir:str,
     vec_env.close()
     del model
 
-def train_grad(seed:int, total_time_steps:int, save_dir:str, log_dir:str, 
+def train_rptgs(seed:int, total_time_steps:int, save_dir:str, log_dir:str,
+                  mkenv_func : Callable, env_args:dict, alg_args:dict, device: str = 'auto'):
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # save dir 변경
+    local_save_dir = os.path.join(save_dir, f"rptgs_td3_{seed}")
+    if not os.path.exists(local_save_dir):
+        os.makedirs(local_save_dir)
+
+    checkpoint_callback = CheckpointCallback(
+        save_freq=total_time_steps//5,
+        save_path=local_save_dir,
+        name_prefix='mid'
+    )
+
+    n_envs = 1  # 원하는 env 개수
+    exploration_noise = 0.1
+    if 'n_envs' in env_args:
+        n_envs = env_args['n_envs']
+    if 'exploration_noise' in env_args:
+        exploration_noise = env_args['exploration_noise']
+    vec_env = DummyVecEnv([mkenv_func() for _ in range(n_envs)])
+    vec_env = VecMonitor(vec_env)
+    action_dim = vec_env.action_space.shape[0]
+    mean    = np.zeros(action_dim)
+    sigma   = exploration_noise * np.ones(action_dim)
+    action_noise = NormalActionNoise(mean=mean, sigma=sigma)
+    td3_args = {k: v for k, v in env_args.items() if k != "n_envs" and k != "exploration_noise"}
+    td3_args.update(alg_args)
+    model = RPTGSTD3("MlpPolicy", vec_env, verbose=0, tensorboard_log=log_dir, seed=seed,
+                      device=device, action_noise=action_noise, **td3_args)
+    # 강제 저장
+    model.save(os.path.join(local_save_dir, 'mid_00000_steps'))
+
+    model.learn(total_timesteps=total_time_steps, tb_log_name=f"RPTGS_TD3_{seed}",
+                callback=checkpoint_callback)
+    #save file 이름
+    save_name = os.path.join(local_save_dir, f"final")
+    model.save(save_name)
+    vec_env.close()
+    del model
+
+def train_grad(seed:int, total_time_steps:int, save_dir:str, log_dir:str,
                   mkenv_func : Callable, env_args:dict, alg_args:dict, device: str = 'auto'):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)

@@ -11,7 +11,7 @@ from stable_baselines3.common.env_util import make_vec_env
 
 from modules.action_extractor import test_some_path
 
-from modules.controller import train_vanilla, train_lips_l, train_lips_g, train_caps, train_grad, train_pave, train_asap
+from modules.controller import train_vanilla, train_lips_l, train_lips_g, train_caps, train_grad, train_pave, train_asap, train_rptgs
 from modules.envs import make_ant_env, make_hopper_env, make_humanoid_env, make_lunar_env, make_pendulum_env, make_reacher_env, make_walker_env
 from modules.params import env_timestep, env_args, alg_args
 
@@ -32,7 +32,8 @@ alg_cnts = dict({
     "caps" : train_caps,
     "grad" : train_grad,
     "pave" : train_pave,
-    "asap" : train_asap
+    "asap" : train_asap,
+    "rptgs" : train_rptgs
 })
 
 save_dir_root = f"./td3/results/pths/"
@@ -57,7 +58,7 @@ parser.add_argument(
 parser.add_argument(
     "--algs",
     nargs="+",
-    choices=["vanilla", "lips_l", "lips_g", "caps", "grad","pave","asap"],
+    choices=["vanilla", "lips_l", "lips_g", "caps", "grad","pave","asap","rptgs"],
     default=["vanilla", "caps", "grad"],
     help="List of environments to train on."
 )
@@ -141,5 +142,5 @@ with ProcessPoolExecutor(max_workers=max_concurrent_num) as executor:
         else:
             print(f"Job {job_func} completed successfully.")
 
-pth_names = ["base_td3", "caps_td3", "grad_td3", "asap_td3","pave_td3","asap_td3"]
+pth_names = ["base_td3", "caps_td3", "grad_td3", "asap_td3","pave_td3","asap_td3","rptgs_td3"]
 test_some_path(save_dir_root, True, pth_names, "test_all")

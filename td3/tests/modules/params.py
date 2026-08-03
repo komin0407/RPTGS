@@ -157,6 +157,15 @@ alg_args = dict({
         pendulum = dict(),
         walker = dict(),
     ),
+    "rptgs" : dict(
+        ant = dict(),
+        hopper = dict(),
+        humanoid = dict(),
+        lunar = dict(),
+        reacher = dict(),
+        pendulum = dict(),
+        walker = dict(),
+    ),
     "caps" : dict(
         ant = dict(
             caps_sigma = 0.2,
