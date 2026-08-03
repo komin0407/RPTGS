@@ -32,6 +32,9 @@ All models live in `td3/models/` and `sac/models/`:
 | alignment-adaptive (exploratory) | — | `RPTGSAdaSAC` (`rptgs_ada_sac.py`) | amplification gated by gradient cosine |
 | **unified (interpolated)** | `RPTGSUnifiedTD3` (`rptgs_unified_td3.py`) | `RPTGSUnifiedSAC` (`rptgs_unified_sac.py`) | single knob `eta` in [0,1]; `eta=0` == cap-only, `eta=1` == norm-balanced (verified numerically) |
 
+Per-environment trainers for every variant, including the unified one
+(`train_rptgs_unified_{sac,td3}_<env>.py`), live under `experiments/<env>/`.
+
 ## 3. Hyperparameters (identical across ALL environments and backbones)
 
 | Parameter | Value | Note |
@@ -112,6 +115,17 @@ python train_rptgs_cap_sac_hopper.py  --max_minutes 420 --run_name sac_cap  --tr
 python train_rptgs_td3_hopper.py      --max_minutes 420 --run_name td3_nb   --train_seed 20260718
 python train_rptgs_cap_td3_hopper.py  --max_minutes 420 --run_name td3_cap  --train_seed 20260718
 python score_hopper.py runs/sac_nb/results.json "label"
+```
+
+Unified (interpolated) trainers take a required `--eta` flag and record it in
+`results.json`; `--eta 0` reproduces the cap-only runs and `--eta 1` the
+norm-balanced runs above (verified numerically to float32 rounding):
+
+```bash
+python train_rptgs_unified_sac_hopper.py --max_minutes 420 --run_name sac_eta05 \
+    --train_seed 20260718 --eta 0.5
+python train_rptgs_unified_td3_hopper.py --max_minutes 420 --run_name td3_eta05 \
+    --train_seed 20260718 --eta 0.5
 ```
 
 Notes:
